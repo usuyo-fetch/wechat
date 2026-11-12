@@ -278,8 +278,7 @@ impl Walker<'_> {
                 if text.is_empty() {
                     String::new()
                 } else {
-                    let fence = if text.contains('`') { "``" } else { "`" };
-                    format!("{fence}{text}{fence}")
+                    inline_code(text)
                 }
             }
             _ => self.inline_all(e),
@@ -546,6 +545,23 @@ fn fenced(pre: ElementRef) -> Option<String> {
     Some(format!("{fence}{lang}\n{text}\n{fence}"))
 }
 
+/// 行内代码：围栏比文字里最长的一串反引号多一个；文字以反引号开头或结尾时两边各垫一个空格
+/// （CommonMark 的规则）。这样正文里的反引号关不掉围栏，后面的字不会被当成 Markdown。
+fn inline_code(text: &str) -> String {
+    let longest = text
+        .split(|c| c != '`')
+        .map(str::len)
+        .max()
+        .unwrap_or_default();
+    let fence = "`".repeat(longest + 1);
+    let pad = if text.starts_with('`') || text.ends_with('`') {
+        " "
+    } else {
+        ""
+    };
+    format!("{fence}{pad}{text}{pad}{fence}")
+}
+
 fn is_web_url(s: &str) -> bool {
     let l = s.trim().to_ascii_lowercase();
     l.starts_with("http://") || l.starts_with("https://")
@@ -676,6 +692,18 @@ mod tests {
     fn tables() {
         let c = md("<table><tr><th>甲</th><th>乙</th></tr><tr><td>1|2</td><td>3</td></tr></table>");
         assert_eq!(c.markdown, "| 甲 | 乙 |\n| --- | --- |\n| 1\\|2 | 3 |");
+    }
+
+    #[test]
+    fn inline_code_cannot_be_closed_by_its_own_text() {
+        assert_eq!(inline_code("x_y"), "`x_y`");
+        assert_eq!(inline_code("a`b"), "``a`b``");
+        // 文字里有两个连着的反引号：两个的围栏会被它关掉，要三个
+        assert_eq!(
+            inline_code("a``b [点这里](https://example.com)"),
+            "```a``b [点这里](https://example.com)```"
+        );
+        assert_eq!(inline_code("`x`"), "`` `x` ``");
     }
 
     #[test]
