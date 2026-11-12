@@ -1,0 +1,73 @@
+# 公众号获取插件：按一条文章链接取单篇文章，不用账号；微信收藏里的文章链接由手机或电脑上的流程交来（还没做）。
+# 几种方法各列一项（usuyo 协议 §2.3.1），没做的也列；行和 usuyo 仓库 docs/platforms/routes.md 第 13 节一一对应
+# （`usuyo-fetch-hook/wechat-mp` 那行在另一个组织，不列）。
+# 收藏的两种方法只交链接，文章内容由同一个仓库里的 `article` 去取。
+protocol: 1
+id: usuyo-fetch/wechat-mp
+kind: fetch
+name: 公众号
+description: 按文章链接取单篇公众号文章的正文（Markdown）、图片、公众号、作者、发布时间和原创标记（不用账号）；微信收藏里的文章链接由手机或电脑上的流程交来
+version: 0.1.0
+license: MIT
+maintainers: [Fldicoahkiin]
+upstream:
+  - name: wechat-article-exporter（单篇管线：页面内嵌数据、按 item_show_type 取正文、被删除页的判断）
+    url: https://github.com/wechat-article/wechat-article-exporter
+    license: MIT
+  - name: wechatmp2markdown（正文元素的对应）
+    url: https://github.com/fengxxc/wechatmp2markdown
+    license: MIT
+  - name: ParseHub（weixin.py 的字段）
+    url: https://github.com/z-mio/ParseHub
+    license: MIT
+platforms: [wechat-mp]
+match:
+  - "mp.weixin.qq.com/s/*"
+  - "mp.weixin.qq.com/s"
+methods:
+  - id: article
+    name: 文章页
+    access: public-web
+    login: none
+    account: none
+    risk:
+      text: 匿名取文章频繁时会出「当前环境异常，完成验证后即可继续访问」的验证页，这种方法回 blocked；节奏设得很慢
+      source: {label: "wewe-rss #388", url: "https://github.com/cooderl/wewe-rss/issues/388"}
+    capabilities:
+      fetch:
+        timeout: 15m
+        outputs: [text, html, images, meta]
+  - id: favorites-iphone
+    name: iPhone 微信收藏
+    built: false
+    access: vision-ui
+    login: required
+    account: own-phone
+    interaction: foreground
+    risk:
+      text: 微信协议 8.2.1.6 禁止用第三方软件读界面、自动操作；镜像没有处罚报告
+      source: {label: "调研 06 §1.2", url: "https://github.com/usuyo/usuyo/blob/main/docs/research/06-platform-access-and-account-risk.md#12-视觉层的风险从哪里来"}
+  - id: favorites-mac
+    name: 电脑微信收藏
+    built: false
+    access: vision-ui
+    login: required
+    account: own-app
+    interaction: foreground
+    risk:
+      text: Mac 微信 4.1 在 macOS 26 上不给界面树；PC 微信读界面有强制下线的报告
+      source: {label: "pywechat #260", url: "https://github.com/Hello-Mr-Crab/pywechat/issues/260"}
+# 匿名取文章会遇到验证页，宿主按最严的取：间隔长、每天少
+pacing:
+  wechat-mp: {batch: true, interval: 30s, daily: 100}
+permissions:
+  fs:
+    write: ["${OUT}"]
+  network:
+    mode: allowlist
+    hosts:
+      - "mp.weixin.qq.com"
+      - "*.qpic.cn"
+      - "*.qlogo.cn"
+run:
+  command: ["${PLUGIN_DIR}/usuyo-fetch-wechat-mp"]
