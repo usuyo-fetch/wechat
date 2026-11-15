@@ -22,7 +22,7 @@
 use url::Url;
 use usuyo_plugin_kit::protocol::{CallFailure, Canonicalized, ErrorCode, Identity, PlatformId};
 
-pub const PLATFORM: &str = "wechat-mp";
+pub const PLATFORM: &str = "wechat";
 pub const HOST: &str = "mp.weixin.qq.com";
 
 /// 短 id 的长度范围：真实的是 22 个字符（Base64 的网址安全写法），留足余量。

@@ -1,11 +1,11 @@
 # 公众号获取插件：按一条文章链接取单篇文章，不用账号；微信收藏里的文章链接由手机或电脑上的流程交来（还没做）。
 # 几种方法各列一项（usuyo 协议 §2.3.1），没做的也列；行和 usuyo 仓库 docs/platforms/routes.md 第 13 节一一对应
-# （`usuyo-fetch-hook/wechat-mp` 那行在另一个组织，不列）。
+# （`usuyo-fetch-hook/wechat` 那行在另一个组织，不列）。
 # 收藏的两种方法只交链接，文章内容由同一个仓库里的 `article` 去取。
 protocol: 1
-id: usuyo-fetch/wechat-mp
+id: usuyo-fetch/wechat
 kind: fetch
-name: 公众号
+name: 微信
 description: 按文章链接取单篇公众号文章的正文（Markdown）、图片、公众号、作者、发布时间和原创标记（不用账号）；微信收藏里的文章链接由手机或电脑上的流程交来
 version: 0.1.0
 license: MIT
@@ -20,7 +20,7 @@ upstream:
   - name: ParseHub（weixin.py 的字段）
     url: https://github.com/z-mio/ParseHub
     license: MIT
-platforms: [wechat-mp]
+platforms: [wechat]
 match:
   - "mp.weixin.qq.com/s/*"
   - "mp.weixin.qq.com/s"
@@ -59,7 +59,7 @@ methods:
       source: {label: "pywechat #260", url: "https://github.com/Hello-Mr-Crab/pywechat/issues/260"}
 # 匿名取文章会遇到验证页，宿主按最严的取：间隔长、每天少
 pacing:
-  wechat-mp: {batch: true, interval: 30s, daily: 100}
+  wechat: {batch: true, interval: 30s, daily: 100}
 permissions:
   fs:
     write: ["${OUT}"]
@@ -70,4 +70,4 @@ permissions:
       - "*.qpic.cn"
       - "*.qlogo.cn"
 run:
-  command: ["${PLUGIN_DIR}/usuyo-fetch-wechat-mp"]
+  command: ["${PLUGIN_DIR}/usuyo-fetch-wechat"]

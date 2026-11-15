@@ -1329,7 +1329,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "usuyo-fetch-wechat-mp"
+name = "usuyo-fetch-wechat"
 version = "0.1.0"
 dependencies = [
  "anyhow",

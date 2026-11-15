@@ -1,11 +1,11 @@
-//! `usuyo-fetch-wechat-mp`：子命令照协议 §3.2，stdout 只写一个信封。
+//! `usuyo-fetch-wechat`：子命令照协议 §3.2，stdout 只写一个信封。
 
 use std::process::ExitCode;
 
 use anyhow::Context;
 use serde::Serialize;
-use usuyo_fetch_wechat_mp::api::{Endpoints, Wechat};
-use usuyo_fetch_wechat_mp::{fetch, link};
+use usuyo_fetch_wechat::api::{Endpoints, Wechat};
+use usuyo_fetch_wechat::{fetch, link};
 use usuyo_plugin_kit::fetch::{Call, USAGE};
 use usuyo_plugin_kit::protocol::{CallFailure, Envelope, ErrorCode, FetchHealth};
 

@@ -1,4 +1,4 @@
-# usuyo-fetch/wechat-mp
+# usuyo-fetch/wechat
 
 公众号的获取插件，供 [usuyo](https://github.com/usuyo/usuyo) 调用：按文章链接取回单篇文章，微信收藏里的文章链接由手机或电脑上的流程交来。
 

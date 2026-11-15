@@ -14,8 +14,8 @@ use std::net::IpAddr;
 use std::path::Path;
 
 use support::{Request, Response, Server, fixture};
-use usuyo_fetch_wechat_mp::api::{Endpoints, Wechat};
-use usuyo_fetch_wechat_mp::fetch;
+use usuyo_fetch_wechat::api::{Endpoints, Wechat};
+use usuyo_fetch_wechat::fetch;
 use usuyo_plugin::protocol::{
     Access, CallFailure, Completeness, ErrorCode, FetchOutput, Identity, ItemKind, NotFoundReason,
     OutputKind, TextFormat,
@@ -202,7 +202,7 @@ fn content_id(out: &FetchOutput) -> &str {
             content_id,
             ..
         }) => {
-            assert_eq!(platform.as_str(), "wechat-mp");
+            assert_eq!(platform.as_str(), "wechat");
             content_id
         }
         other => panic!("{other:?}"),

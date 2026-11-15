@@ -1,5 +1,5 @@
 [package]
-name = "usuyo-fetch-wechat-mp"
+name = "usuyo-fetch-wechat"
 description = "usuyo 的公众号获取插件：个人备份、离线阅读"
 version = "0.1.0"
 edition = "2024"
@@ -7,11 +7,11 @@ license = "MIT"
 publish = false
 
 [lib]
-name = "usuyo_fetch_wechat_mp"
+name = "usuyo_fetch_wechat"
 path = "src/lib.rs"
 
 [[bin]]
-name = "usuyo-fetch-wechat-mp"
+name = "usuyo-fetch-wechat"
 path = "src/main.rs"
 
 [dependencies]

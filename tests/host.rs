@@ -10,7 +10,7 @@ use usuyo_plugin::{
     discover,
 };
 
-const BIN: &str = env!("CARGO_BIN_EXE_usuyo-fetch-wechat-mp");
+const BIN: &str = env!("CARGO_BIN_EXE_usuyo-fetch-wechat");
 const ID: &str = "tr38EieqyftubIx2FMWUWw";
 
 /// 清空环境后运行，和宿主一样。
@@ -34,7 +34,7 @@ fn canonicalize_needs_no_network() {
     assert_eq!(code, 0);
     assert_eq!(out["ok"], true);
     assert_eq!(out["match"], true);
-    assert_eq!(out["identity"]["platform"], "wechat-mp");
+    assert_eq!(out["identity"]["platform"], "wechat");
     assert_eq!(out["identity"]["contentId"], ID);
     assert_eq!(
         out["identity"]["url"],
@@ -99,12 +99,7 @@ fn each_call_goes_to_its_method() {
     let link = format!("https://mp.weixin.qq.com/s/{ID}");
     for args in [
         &["sources", "--method", "article"][..],
-        &[
-            "list",
-            "wechat-mp:favorites",
-            "--method",
-            "favorites-iphone",
-        ][..],
+        &["list", "wechat:favorites", "--method", "favorites-iphone"][..],
         &[
             "fetch",
             &link,
@@ -137,14 +132,14 @@ fn each_call_goes_to_its_method() {
     assert_eq!(out["error"]["code"], "unsupported-input");
 }
 
-/// 清单装成宿主认的样子：`<root>/usuyo-fetch/wechat-mp/<version>/`。
+/// 清单装成宿主认的样子：`<root>/usuyo-fetch/wechat/<version>/`。
 fn host() -> (tempfile::TempDir, PluginHost) {
     let tmp = tempfile::tempdir().unwrap();
-    let dir = tmp.path().join("plugins/usuyo-fetch/wechat-mp/0.1.0");
+    let dir = tmp.path().join("plugins/usuyo-fetch/wechat/0.1.0");
     std::fs::create_dir_all(&dir).unwrap();
     let manifest = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("usuyo-plugin.yaml");
     std::fs::copy(manifest, dir.join("usuyo-plugin.yaml")).unwrap();
-    std::fs::copy(BIN, dir.join("usuyo-fetch-wechat-mp")).unwrap();
+    std::fs::copy(BIN, dir.join("usuyo-fetch-wechat")).unwrap();
     let found = discover(&tmp.path().join("plugins")).unwrap();
     assert!(found.rejected.is_empty(), "{:?}", found.rejected);
     let host = PluginHost::new(
@@ -163,10 +158,10 @@ fn host() -> (tempfile::TempDir, PluginHost) {
 async fn the_manifest_lists_every_row_of_routes_and_matches_both_link_forms() {
     let (_tmp, host) = host();
     let plugin = &host.plugins()[0];
-    assert_eq!(plugin.id().as_str(), "usuyo-fetch/wechat-mp");
+    assert_eq!(plugin.id().as_str(), "usuyo-fetch/wechat");
     assert_eq!(plugin.header.version.to_string(), env!("CARGO_PKG_VERSION"));
     let spec = &plugin.spec;
-    // routes.md 第 13 节的每一行（`usuyo-fetch-hook/wechat-mp` 那行在另一个组织），顺序照清单
+    // routes.md 第 13 节的每一行（`usuyo-fetch-hook/wechat` 那行在另一个组织），顺序照清单
     let ids: Vec<&str> = spec.methods.iter().map(|m| m.id.as_str()).collect();
     assert_eq!(ids, ["article", "favorites-iphone", "favorites-mac"]);
     let article = spec.method("article").unwrap();
